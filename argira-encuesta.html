@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Argira — Tu opinión (2 minutos)</title>
+<meta name="description" content="8 preguntas, 2 minutos. Accesible con lector de pantalla, teclado o ratón.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+:root {
+  --bg:      #f5f2ed;
+  --surface: #ffffff;
+  --ink:     #1c1a17;
+  --gold:    #b8922a;
+  --gold-lt: #e8d5a3;
+  --muted:   #6b6560;
+  --border:  #ddd9d1;
+  --err:     #8b1a1a;
+  --radius:  4px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.65;
+  min-height: 100vh;
+}
+
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+:focus:not(:focus-visible) { outline: none; }
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--ink);
+  padding: 0.6rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
+  border-bottom: 2px solid var(--gold);
+}
+.topbar .brand {
+  font-family: 'Lora', serif;
+  color: var(--gold); font-size: 1.1rem; font-weight: 700;
+  letter-spacing: 0.1em; text-decoration: none;
+}
+.topbar nav { display: flex; gap: 1.2rem; flex-wrap: wrap; }
+.topbar nav a {
+  color: #bbb; text-decoration: none;
+  font-size: 0.82rem; transition: color 0.15s;
+}
+.topbar nav a:hover { color: var(--gold); }
+
+/* ── HERO ── */
+.hero {
+  background: var(--ink);
+  padding: 2.5rem 1.5rem 2rem;
+  text-align: center;
+  border-bottom: 3px solid var(--gold);
+}
+.hero h1 {
+  font-family: 'Lora', serif;
+  color: #f0ece4;
+  font-size: clamp(1.9rem, 5vw, 3rem);
+  letter-spacing: 0.12em;
+  margin-bottom: 0.5rem;
+}
+.hero .tagline {
+  color: var(--gold);
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 1.1rem;
+}
+.hero p {
+  color: #b8b3ab;
+  font-size: 0.93rem;
+  max-width: 460px;
+  margin: 0 auto 1.3rem;
+  line-height: 1.7;
+}
+.hero strong { color: #f0ece4; }
+
+/* Accessibility badge */
+.a11y-strip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(184,146,42,0.15);
+  border: 1px solid var(--gold);
+  border-radius: 100px;
+  padding: 0.35rem 1rem;
+  font-size: 0.75rem;
+  color: var(--gold);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+/* ── MAIN ── */
+main {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 5rem;
+}
+
+/* Accessibility info box */
+.a11y-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--gold);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 1rem 1.2rem;
+  margin-bottom: 2rem;
+  font-size: 0.87rem;
+  color: var(--muted);
+  line-height: 1.65;
+}
+.a11y-box strong { color: var(--ink); }
+.a11y-box p + p { margin-top: 0.4rem; }
+
+.meta {
+  font-size: 0.75rem;
+  color: var(--gold);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: right;
+  margin-bottom: 1.5rem;
+}
+
+/* ── QUESTION BLOCK ── */
+.q {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--gold);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 1.4rem 1.4rem 1.2rem;
+  margin-bottom: 1.2rem;
+}
+
+.q-num {
+  font-size: 0.68rem;
+  color: var(--gold);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+  display: block;
+}
+.q-label {
+  font-family: 'Lora', serif;
+  font-size: 1.05rem;
+  color: var(--ink);
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 0.2rem;
+}
+.q-sub {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0.9rem;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* Text input */
+.field { margin-top: 0.1rem; }
+.field label {
+  display: block;
+  font-size: 0.87rem;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+  color: var(--ink);
+}
+.field input[type="text"],
+.field textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: white;
+  font-family: inherit;
+  font-size: 0.97rem;
+  color: var(--ink);
+  transition: border-color 0.15s;
+  min-height: 48px;
+}
+.field input:focus, .field textarea:focus { border-color: var(--gold); }
+.field textarea { min-height: 100px; resize: vertical; line-height: 1.6; }
+.field.err input { border-color: var(--err); }
+.field .errmsg {
+  display: none;
+  font-size: 0.8rem;
+  color: var(--err);
+  font-weight: 600;
+  margin-top: 0.35rem;
+}
+.field.err .errmsg { display: block; }
+
+/* Radio options */
+.opts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.1rem;
+}
+.opts label {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.7rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: white;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--ink);
+  min-height: 48px;
+  transition: border-color 0.12s, background 0.12s;
+  line-height: 1.35;
+}
+.opts label:hover { border-color: var(--gold-lt); }
+.opts input[type="radio"] {
+  width: 18px; height: 18px;
+  accent-color: var(--ink);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.opts label:has(input:checked) {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #f0ece4;
+}
+
+/* ── SUBMIT ── */
+.btn-send {
+  display: block; width: 100%;
+  padding: 1rem 2rem;
+  background: var(--gold);
+  color: var(--ink);
+  font-family: 'Lora', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: 2px solid var(--gold);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.18s;
+  margin-top: 1.8rem;
+  letter-spacing: 0.02em;
+}
+.btn-send:hover { background: var(--ink); color: #f0ece4; border-color: var(--ink); }
+.btn-send:disabled { opacity: 0.45; cursor: not-allowed; }
+
+#spinner { display: none; text-align: center; padding: 1rem; color: var(--muted); font-size: 0.9rem; }
+#spinner.on { display: block; }
+
+.privacy-note {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-style: italic;
+  line-height: 1.6;
+  border-left: 3px solid var(--border);
+  padding-left: 0.9rem;
+  margin-top: 1.5rem;
+}
+
+/* ── SUCCESS ── */
+#success { display: none; text-align: center; padding: 3rem 1rem; }
+#success .tick { font-size: 3rem; margin-bottom: 1rem; }
+#success h2 { font-family: 'Lora', serif; font-size: 1.8rem; margin-bottom: 0.8rem; }
+#success p { color: var(--muted); max-width: 400px; margin: 0 auto 1.5rem; line-height: 1.7; }
+.id-box {
+  font-family: monospace;
+  background: var(--ink);
+  color: var(--gold);
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  display: inline-block;
+  border-radius: var(--radius);
+  margin-bottom: 1.8rem;
+}
+.action-btns { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; }
+.btn-act {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.85rem 1.6rem;
+  background: var(--ink);
+  color: #f0ece4;
+  font-family: 'Lora', serif;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-act:hover { background: var(--gold); color: var(--ink); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--ink);
+  border-top: 2px solid var(--gold);
+  text-align: center;
+  padding: 1.8rem 1rem;
+  font-size: 0.75rem;
+  color: #777;
+  line-height: 1.9;
+}
+footer .brand-f {
+  font-family: 'Lora', serif;
+  color: var(--gold);
+  font-size: 1rem;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+footer a { color: var(--gold); text-decoration: none; }
+
+@media (max-width: 500px) {
+  .topbar nav a:not(:first-child):not(:last-child) { display: none; }
+  main { padding: 1.5rem 1rem 3rem; }
+  .q { padding: 1rem 1rem 0.9rem; }
+}
+</style>
+</head>
+<body>
+
+<div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+<div class="topbar">
+  <a href="https://argira.eus/argira-sonification" class="brand" aria-label="Ir a Argira">ARGIRA</a>
+  <nav aria-label="Navegación">
+    <a href="https://argira.eus/argira-sonification">← Museo</a>
+    <a href="https://argira.eus/argira-analizador/">Analizador</a>
+    <a href="https://doi.org/10.5281/zenodo.20097327">Dataset</a>
+  </nav>
+</div>
+
+<div class="hero" role="banner">
+  <h1>ARGIRA</h1>
+  <div class="tagline">Cuéntanos tu experiencia</div>
+  <p><strong>8 preguntas · 2 minutos.</strong><br>Tu opinión mejora Argira para que el arte sea accesible a todo el mundo.</p>
+  <div class="a11y-strip" role="note" aria-label="Información de accesibilidad">
+    ✓ Compatible con lector de pantalla, teclado y switch
+  </div>
+</div>
+
+<main id="main" tabindex="-1">
+<div id="form-wrap">
+
+  <!-- Accessibility info -->
+  <div class="a11y-box" role="note" aria-label="Cómo navegar este formulario">
+    <p><strong>Cómo navegar:</strong> <kbd>Tab</kbd> pasa entre preguntas · flechas ↑↓ eligen opción · <kbd>Espacio</kbd> o <kbd>Enter</kbd> confirma.</p>
+    <p>¿Algo no funciona con tu lector o dispositivo? Cuéntalo en la última pregunta — es información muy valiosa.</p>
+  </div>
+
+  <p class="meta" aria-hidden="true">8 preguntas · solo el nombre es obligatorio</p>
+
+  <!-- 1 · NOMBRE -->
+  <div class="q" role="group" aria-labelledby="q1-title">
+    <span class="q-num" id="q1-num">1 / 8 · Obligatorio</span>
+    <div class="q-label" id="q1-title">¿Cómo te llamas?</div>
+    <div class="q-sub">Nombre y apellidos, para que tu participación quede registrada.</div>
+    <div class="field" id="fg-nombre">
+      <label for="nombre">Nombre y apellidos <span aria-hidden="true">*</span></label>
+      <input type="text" id="nombre" name="nombre"
+             autocomplete="name" required aria-required="true"
+             placeholder="Escribe tu nombre completo"
+             aria-describedby="err-nombre">
+      <div class="errmsg" role="alert" id="err-nombre">Por favor, escribe tu nombre antes de enviar.</div>
+    </div>
+  </div>
+
+  <!-- 2 · PERFIL -->
+  <div class="q" role="group" aria-labelledby="q2-title">
+    <span class="q-num">2 / 8</span>
+    <div class="q-label" id="q2-title">¿Cómo describirías tu visión?</div>
+    <div class="q-sub">Elige la opción que mejor te represente.</div>
+    <div class="opts" role="radiogroup" aria-labelledby="q2-title">
+      <label><input type="radio" name="perfil" value="Ceguera total"><span>Ceguera total</span></label>
+      <label><input type="radio" name="perfil" value="Baja visión"><span>Baja visión</span></label>
+      <label><input type="radio" name="perfil" value="Visión parcial"><span>Visión parcial (resto visual)</span></label>
+      <label><input type="radio" name="perfil" value="Visión completa"><span>Visión completa</span></label>
+      <label><input type="radio" name="perfil" value="Prefiero no indicar"><span>Prefiero no indicarlo</span></label>
+    </div>
+  </div>
+
+  <!-- 3 · ACIERTOS -->
+  <div class="q" role="group" aria-labelledby="q3-title">
+    <span class="q-num">3 / 8</span>
+    <div class="q-label" id="q3-title">¿Cuántos pares acertaste en el test de escucha?</div>
+    <div class="q-sub">Había 3 pares: cuadros con distinta cantidad de color convertida en sonido.</div>
+    <div class="opts" role="radiogroup" aria-labelledby="q3-title">
+      <label><input type="radio" name="aciertos" value="0"><span>Ninguno (0 / 3)</span></label>
+      <label><input type="radio" name="aciertos" value="1"><span>Uno (1 / 3)</span></label>
+      <label><input type="radio" name="aciertos" value="2"><span>Dos (2 / 3)</span></label>
+      <label><input type="radio" name="aciertos" value="3"><span>Los tres (3 / 3)</span></label>
+      <label><input type="radio" name="aciertos" value="No realizado"><span>No hice el test</span></label>
+    </div>
+  </div>
+
+  <!-- 4 · COMPRENSIÓN -->
+  <div class="q" role="group" aria-labelledby="q4-title">
+    <span class="q-num">4 / 8</span>
+    <div class="q-label" id="q4-title">¿Entendiste qué parte del cuadro describía cada audio?</div>
+    <div class="q-sub">1 = nada claro · 5 = totalmente claro</div>
+    <div class="opts" role="radiogroup" aria-labelledby="q4-title">
+      <label><input type="radio" name="comprension" value="1"><span>1 — Nada claro</span></label>
+      <label><input type="radio" name="comprension" value="2"><span>2 — Poco claro</span></label>
+      <label><input type="radio" name="comprension" value="3"><span>3 — Más o menos</span></label>
+      <label><input type="radio" name="comprension" value="4"><span>4 — Bastante claro</span></label>
+      <label><input type="radio" name="comprension" value="5"><span>5 — Totalmente claro</span></label>
+    </div>
+  </div>
+
+  <!-- 5 · VOCABULARIO -->
+  <div class="q" role="group" aria-labelledby="q5-title">
+    <span class="q-num">5 / 8</span>
+    <div class="q-label" id="q5-title">¿Las descripciones sonoras eran comprensibles y apropiadas?</div>
+    <div class="q-sub">1 = muy inadecuadas · 5 = muy adecuadas</div>
+    <div class="opts" role="radiogroup" aria-labelledby="q5-title">
+      <label><input type="radio" name="vocabulario" value="1"><span>1 — Muy inadecuadas</span></label>
+      <label><input type="radio" name="vocabulario" value="2"><span>2 — Poco adecuadas</span></label>
+      <label><input type="radio" name="vocabulario" value="3"><span>3 — Aceptables</span></label>
+      <label><input type="radio" name="vocabulario" value="4"><span>4 — Bastante adecuadas</span></label>
+      <label><input type="radio" name="vocabulario" value="5"><span>5 — Muy adecuadas</span></label>
+    </div>
+  </div>
+
+  <!-- 6 · DIFERENCIAS -->
+  <div class="q" role="group" aria-labelledby="q6-title">
+    <span class="q-num">6 / 8</span>
+    <div class="q-label" id="q6-title">¿Notaste diferencias claras entre cuadros con mucho y poco color?</div>
+    <div class="q-sub">1 = ninguna diferencia · 5 = diferencia muy clara</div>
+    <div class="opts" role="radiogroup" aria-labelledby="q6-title">
+      <label><input type="radio" name="diferencia" value="1"><span>1 — Ninguna diferencia</span></label>
+      <label><input type="radio" name="diferencia" value="2"><span>2 — Apenas diferencias</span></label>
+      <label><input type="radio" name="diferencia" value="3"><span>3 — Algo diferente</span></label>
+      <label><input type="radio" name="diferencia" value="4"><span>4 — Bastante diferente</span></label>
+      <label><input type="radio" name="diferencia" value="5"><span>5 — Diferencia muy clara</span></label>
+    </div>
+  </div>
+
+  <!-- 7 · NAVEGACIÓN ASISTIVA -->
+  <div class="q" role="group" aria-labelledby="q7-title">
+    <span class="q-num">7 / 8</span>
+    <div class="q-label" id="q7-title">¿Pudiste navegar Argira con tu tecnología habitual?</div>
+    <div class="q-sub">Lector de pantalla, teclado, switch u otra.</div>
+    <div class="opts" role="radiogroup" aria-labelledby="q7-title">
+      <label><input type="radio" name="navtec" value="Sí, sin problemas"><span>Sí, sin problemas</span></label>
+      <label><input type="radio" name="navtec" value="Con alguna dificultad"><span>Sí, pero con alguna dificultad</span></label>
+      <label><input type="radio" name="navtec" value="No lo he intentado"><span>No lo intenté así</span></label>
+      <label><input type="radio" name="navtec" value="No ha sido posible"><span>No, no fue posible</span></label>
+    </div>
+  </div>
+
+  <!-- 8 · COMENTARIO -->
+  <div class="q" role="group" aria-labelledby="q8-title">
+    <span class="q-num">8 / 8 · Opcional</span>
+    <div class="q-label" id="q8-title">¿Quieres añadir algo?</div>
+    <div class="q-sub">Cualquier sugerencia, crítica o idea — con eso también mejoramos.</div>
+    <div class="field">
+      <label for="comentarios">Tu comentario (opcional)</label>
+      <textarea id="comentarios" name="comentarios" placeholder="Escribe lo que quieras…"></textarea>
+    </div>
+  </div>
+
+  <p class="privacy-note">
+    Datos confidenciales. Se usan exclusivamente para mejorar Argira y avalar el proyecto. No se publicarán datos individuales.
+  </p>
+
+  <button type="button" class="btn-send" id="btn-send" onclick="send()">
+    Enviar mi opinión
+  </button>
+
+  <div id="spinner" aria-live="polite" aria-label="Enviando respuestas">Enviando…</div>
+
+</div><!-- /form-wrap -->
+
+<!-- SUCCESS -->
+<div id="success" role="status" aria-live="polite" tabindex="-1">
+  <div class="tick" aria-hidden="true">✓</div>
+  <h2>¡Gracias!</h2>
+  <p>Tu opinión queda registrada y nos ayuda a hacer Argira mejor para todo el mundo.</p>
+  <div class="id-box" id="id-display">ARG-XXXXXXX</div>
+  <div class="action-btns">
+    <button class="btn-act" type="button" onclick="makePDF()">📄 Descargar justificante</button>
+    <a class="btn-act" href="https://argira.eus/argira-sonification">← Volver al museo</a>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <span class="brand-f">ARGIRA</span>
+  Jose Ranero García · Proyecto de accesibilidad cultural<br>
+  r(hue_std, Ds) = 0.9289 · R² = 0.8629 · p &lt; 0.001 · N=47 obras · 15 artistas<br><br>
+  <a href="https://doi.org/10.5281/zenodo.20097327">📄 Dataset en Zenodo</a>
+</footer>
+
+<script>
+const D = {};
+
+function collect() {
+  ['perfil','aciertos','comprension','vocabulario','diferencia','navtec'].forEach(n => {
+    const r = document.querySelector(`input[name="${n}"]:checked`);
+    D[n] = r ? r.value : '';
+  });
+  D.nombre      = document.getElementById('nombre').value.trim();
+  D.comentarios = document.getElementById('comentarios').value.trim();
+}
+
+function validate() {
+  collect();
+  const fg = document.getElementById('fg-nombre');
+  if (!D.nombre) {
+    fg.classList.add('err');
+    document.getElementById('nombre').focus();
+    say('El nombre es obligatorio. Por favor, escríbelo antes de enviar.');
+    return false;
+  }
+  fg.classList.remove('err');
+  return true;
+}
+
+async function send() {
+  if (!validate()) return;
+
+  D.timestamp     = new Date().toISOString();
+  D.id_validacion = 'ARG-' + Math.random().toString(36).substr(2,7).toUpperCase();
+
+  document.getElementById('btn-send').disabled = true;
+  document.getElementById('spinner').classList.add('on');
+
+  // ─── SUPABASE ───────────────────────────────────────────
+  //  Reemplaza las dos líneas siguientes con tus credenciales:
+  //  supabase.com/dashboard → Settings → API
+  //
+  //  Tabla mínima (SQL Editor):
+  //  create table respuestas (
+  //    id uuid primary key default gen_random_uuid(),
+  //    id_validacion text, nombre text, perfil text,
+  //    aciertos text, comprension text, vocabulario text,
+  //    diferencia text, navtec text, comentarios text,
+  //    timestamp timestamptz default now()
+  //  );
+  //  alter table respuestas enable row level security;
+  //  create policy "insert libre" on respuestas for insert with check (true);
+  // ────────────────────────────────────────────────────────
+  const URL_SB = 'https://vyimfbicxswdolsthsmc.supabase.co';  // ← cambia
+  const KEY_SB = 'sb_publishable_4a_H5GoiWpq7pAJW7L8L_w_1kWeUw_x';              // ← cambia
+
+  try {
+    const res = await fetch(`${URL_SB}/rest/v1/respuestas`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': KEY_SB,
+        'Authorization': `Bearer ${KEY_SB}`,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(D)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    showSuccess();
+  } catch(e) {
+    console.warn('Supabase no disponible:', e);
+    try { localStorage.setItem(`argira_${D.id_validacion}`, JSON.stringify(D)); } catch(_) {}
+    showSuccess();
+    say('Guardado localmente. Se sincronizará cuando haya conexión.');
+  }
+
+  document.getElementById('spinner').classList.remove('on');
+}
+
+function showSuccess() {
+  document.getElementById('form-wrap').style.display = 'none';
+  const s = document.getElementById('success');
+  s.style.display = 'block';
+  document.getElementById('id-display').textContent = D.id_validacion;
+  s.focus();
+  say(`Enviado. Código de participación: ${D.id_validacion}.`);
+}
+
+function makePDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const G = '#c8a84b', K = [26,26,26], W = [240,236,228], gold = [200,168,75];
+
+  // Header
+  doc.setFillColor(...K); doc.rect(0,0,210,38,'F');
+  doc.setTextColor(...gold); doc.setFontSize(20); doc.setFont('helvetica','bold');
+  doc.text('ARGIRA', 20,16);
+  doc.setFontSize(8); doc.setFont('helvetica','normal');
+  doc.text('Museo Sonoro · Justificante de participación', 20,24);
+  doc.text('Jose Ranero García', 20,31);
+  doc.setTextColor(150,150,150);
+  doc.text(`ID: ${D.id_validacion}`, 130,20);
+  doc.text(`${new Date().toLocaleString('es-ES')}`, 130,27);
+  doc.setDrawColor(...gold); doc.setLineWidth(0.4); doc.line(20,43,190,43);
+
+  doc.setTextColor(...K); let y = 52;
+  const row = (lbl, val) => {
+    doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.text(lbl, 20, y);
+    doc.setFont('helvetica','normal'); doc.text(String(val||'—'), 90, y); y += 7;
+  };
+
+  doc.setFontSize(11); doc.setFont('helvetica','bold'); doc.text('PARTICIPANTE', 20, y); y += 7;
+  row('Nombre:', D.nombre); row('Perfil visual:', D.perfil);
+  y += 2; doc.setDrawColor(210,206,198); doc.line(20,y,190,y); y += 8;
+
+  doc.setFontSize(11); doc.setFont('helvetica','bold'); doc.text('TEST AUDITIVO', 20, y); y += 7;
+  row('Pares acertados:', D.aciertos);
+  y += 2; doc.line(20,y,190,y); y += 8;
+
+  doc.setFontSize(11); doc.setFont('helvetica','bold'); doc.text('EXPERIENCIA', 20, y); y += 7;
+  row('Claridad descripción:', D.comprension ? D.comprension+' / 5' : '');
+  row('Vocabulario:', D.vocabulario ? D.vocabulario+' / 5' : '');
+  row('Percepción diferencias:', D.diferencia ? D.diferencia+' / 5' : '');
+  row('Navegación asistiva:', D.navtec);
+
+  if (D.comentarios) {
+    y += 2; doc.line(20,y,190,y); y += 8;
+    doc.setFontSize(11); doc.setFont('helvetica','bold'); doc.text('COMENTARIOS', 20, y); y += 7;
+    doc.setFontSize(9); doc.setFont('helvetica','normal');
+    doc.text(doc.splitTextToSize(D.comentarios, 165), 20, y);
+  }
+
+  // Footer
+  doc.setFillColor(...K); doc.rect(0,274,210,23,'F');
+  doc.setTextColor(140,140,140); doc.setFontSize(6.5);
+  doc.text('Justificante de participación — Argira · Jose Ranero García', 20,281);
+  doc.text('r(hue_std, Ds) = 0.9289 · R² = 0.8629 · p < 0.001 · N=47 obras · 15 artistas', 20,287);
+  doc.setTextColor(...gold); doc.text('argira.eus', 172,281);
+
+  doc.save(`Argira_${D.id_validacion}.pdf`);
+  say('Justificante descargado.');
+}
+
+function say(msg) {
+  const r = document.getElementById('live');
+  r.textContent = '';
+  setTimeout(() => { r.textContent = msg; }, 60);
+}
+
+// Import score from URL (?aciertos=2)
+(function() {
+  const sc = new URLSearchParams(location.search).get('aciertos');
+  if (sc) {
+    const r = document.querySelector(`input[name="aciertos"][value="${sc}"]`);
+    if (r) { r.checked = true; say(`Resultado del test importado: ${sc} aciertos.`); }
+  }
+})();
+</script>
+</body>
+</html>
